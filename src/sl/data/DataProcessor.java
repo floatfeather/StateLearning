@@ -22,16 +22,20 @@ public class DataProcessor {
 			BufferedReader reader = new BufferedReader(new FileReader(f));
 			String line;
 			while((line = reader.readLine()) != null) {
-				String words[] = line.split(" ");
+				if (line.isEmpty()) continue;
+				String words[] = line.split("\t");
 				ArrayList<Descriptor> result = new ArrayList<Descriptor>();
 				for(String word: words) {
 					String parts[] = word.split(":");
-					if (parts.length != 2) {
-						System.err.println("Wrong format " + word);
-						reader.close();
-						return null;
+					if (parts.length == 1) {
+						result.add(new Descriptor(parts[0], ""));
+					} else if (parts.length == 2) {
+						result.add(new Descriptor(parts[0], parts[1]));
+					} else {
+						int pos = word.indexOf(":");
+						String res = word.substring(pos + 1);
+						result.add(new Descriptor(parts[0], res));
 					}
-					result.add(new Descriptor(parts[0], parts[1]));
 				}
 				results.add(result);
 			}
@@ -48,10 +52,13 @@ public class DataProcessor {
 		Map<String, ArrayList<String>> results = new HashMap<String, ArrayList<String>>();
 		File testDirs[] = f.listFiles();
 		for(File testDir : testDirs) {
+			if (testDir.getName().equals(".DS_Store")) continue;
 			ArrayList<String> inner = new ArrayList<String>();
 			File testFiles[] = testDir.listFiles();
 			for(File testFile : testFiles) {
 				inner.add(testFile.getName());
+				File nf = new File(project.getProjectPath() + "/" + testDir.getName() + "/" + testFile.getName());
+				nf.mkdirs();
 			}
 			results.put(testDir.getName(), inner);
 		}
@@ -89,7 +96,7 @@ public class DataProcessor {
 	private void fillQuantativeInfo(ArrayList<ArrayList<Descriptor>> desc1, ArrayList<ArrayList<Descriptor>> desc2,
 			ArrayList<ArrayList<Descriptor>> desc3, HashMap<String, HashMap<String, Integer>> quantativeInfo) {
 		List<Boolean> typeInfo = new ArrayList<Boolean>();
-		for(int i = 0; i < desc1.size(); i++) {
+		for(int i = 0; i < desc1.get(0).size(); i++) {
 			typeInfo.add(false);
 		}
 		fillTypeInfo(desc1, typeInfo);
@@ -125,7 +132,7 @@ public class DataProcessor {
 			if (!result.isEmpty()) result += ",";
 			HashMap<String, Integer> q = quantativeInfo.get(desc.getKey());
 			if (q == null) {
-				if (StringUtils.isBoolean(desc.getKey())) {
+				if (StringUtils.isBoolean(desc.getValue())) {
 					result += desc.getValue().equals("true") ? 1 : 0;
 				} else {
 					result += desc.getValue();
@@ -164,10 +171,14 @@ public class DataProcessor {
 		List<String> results = new ArrayList<String>();
 		results.add(StringUtils.toString(header, ","));
 		for(ArrayList<Descriptor> content : negContents) {
-			results.add(descToString(content, quantativeInfo));
+			String res = descToString(content, quantativeInfo);
+			res += ",1";
+			results.add(res);
 		}
 		for(ArrayList<Descriptor> content : posContents) {
-			results.add(descToString(content, quantativeInfo));
+			String res = descToString(content, quantativeInfo);
+			res += ",0";
+			results.add(res);
 		}
 		IOUtils.writeToFile(results, path);
 	}
@@ -204,6 +215,8 @@ public class DataProcessor {
 		for(Entry<String, ArrayList<String>> failedTest : failedTestInfo.entrySet()) {
 			String outputPrefix = project.getProjectPath() + "/" + failedTest.getKey();
 			for(String test : failedTest.getValue()) {
+				System.out.println(failedTest.getKey() + "/" + test);
+//				if (!test.equals("org.jfree.chart.plot.Marker#?#Marker#?,Paint,Stroke,Paint,Stroke,float")) continue;
 				String failedPath = failedPrefix + "/" + failedTest.getKey() + "/" + test;
 				String negPath = negPrefix + "/" + test;
 				String posPath = posPrefix + "/" + test;
@@ -230,7 +243,7 @@ public class DataProcessor {
 	}
 	
 	public static void main(String args[]) {
-		Project project = new Project(ProjectInfo.getProjectID("chart"), 20);
+		Project project = new Project(ProjectInfo.getProjectID("math"), 3);
 		DataProcessor processor = new DataProcessor();
 		processor.run(project);
 	}

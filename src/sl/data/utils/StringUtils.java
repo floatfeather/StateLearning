@@ -36,7 +36,7 @@ public class StringUtils {
 	}
 	
 	public static boolean isQuantative(String input) {
-		return isNumber(input) || isBoolean(input);
+		return !(isNumber(input) || isBoolean(input));
 	}
 	
 	public static String toString(List<String> input, String sep) {

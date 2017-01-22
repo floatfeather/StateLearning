@@ -10,8 +10,10 @@ public class ProjectInfo {
 	static {
 		idToName.put(0, "lang");
 		idToName.put(1, "chart");
+		idToName.put(2, "math");
 		nameToID.put("lang", 0);
 		nameToID.put("chart", 1);
+		nameToID.put("math", 2);
 	};
 	
 	public static int getProjectID(String projectName) {
