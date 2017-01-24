@@ -169,7 +169,7 @@ public class DataProcessor {
 	private void generateTrainingSet(ArrayList<ArrayList<Descriptor>> negContents, ArrayList<ArrayList<Descriptor>> posContents,
 			List<String> header, HashMap<String, HashMap<String, Integer>> quantativeInfo, String path) {
 		List<String> results = new ArrayList<String>();
-		results.add(StringUtils.toString(header, ","));
+		results.add(StringUtils.toString(header, ",") + ",label");
 		for(ArrayList<Descriptor> content : negContents) {
 			String res = descToString(content, quantativeInfo);
 			res += ",1";
@@ -243,7 +243,7 @@ public class DataProcessor {
 	}
 	
 	public static void main(String args[]) {
-		Project project = new Project(ProjectInfo.getProjectID("math"), 3);
+		Project project = new Project(ProjectInfo.getProjectID("chart"), 20);
 		DataProcessor processor = new DataProcessor();
 		processor.run(project);
 	}
