@@ -119,7 +119,7 @@ public class DataProcessor {
 					temp[item.getValue()] = item.getKey();
 				}
 				for(int i = 0; i < temp.length - 1; i++) {
-					header.add(temp[i]);
+					header.add("\"" + temp[i] + "\"");
 				}
 			}
 		}
@@ -228,6 +228,7 @@ public class DataProcessor {
 					continue;
 				}
 				if ((!checkFormat(negContents)) || (!checkFormat(posContents)) || (!checkFormat(failedContents))) {
+					System.out.println("Format error in " + outputPrefix);
 					deleteFiles(outputPrefix);
 					break;
 				}
@@ -243,7 +244,7 @@ public class DataProcessor {
 	}
 	
 	public static void main(String args[]) {
-		Project project = new Project(ProjectInfo.getProjectID("chart"), 20);
+		Project project = new Project(ProjectInfo.getProjectID("lang"), 26);
 		DataProcessor processor = new DataProcessor();
 		processor.run(project);
 	}

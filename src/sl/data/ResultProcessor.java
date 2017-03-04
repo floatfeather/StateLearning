@@ -85,7 +85,7 @@ public class ResultProcessor {
 					continue;
 				}
 				String parts[] = line.split(",");
-				pred.addPrediction(Double.valueOf(parts[parts.length - 1]));
+				pred.addPrediction(parts[parts.length - 1]);
 				pred.addText(line);
 			}
 			reader.close();
